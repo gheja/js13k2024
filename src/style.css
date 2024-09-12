@@ -24,10 +24,6 @@ b
 }
 
 #d {
-	/*
-	transform: scale(1) perspective(800px);
-	left: 0px;
-	*/
 	transform-origin: 0px 0px 0px;
 }
 
