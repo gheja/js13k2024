@@ -1,5 +1,7 @@
 "use strict"
 
+const MAX_SPEED = 75
+
 let _width = 800
 let _scale
 let _mousePosition = 0
@@ -23,8 +25,11 @@ function updateGameObject(obj, dt)
 
 function stepPlayerObject(obj, dt)
 {
-	var a = clamp(_mousePosition, -0.9, 0.9) * 1.098 * 200
-	obj[1] = obj[1] + (a - obj[1]) * 3 * dt
+	var targetPosition = clamp(_mousePosition, -0.9, 0.9) * 1.098 * 200 // 1.098 is to compensate for the character not being at the very bottom
+	var direction = targetPosition > obj[1] ? 1 : -1
+	var speed = Math.min(Math.abs(targetPosition - obj[1]), MAX_SPEED)
+
+	obj[1] = obj[1] + speed * direction * 8 * dt
 }
 
 function stepEnemyObject(obj, dt)
