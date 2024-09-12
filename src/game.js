@@ -1,6 +1,19 @@
 "use strict"
 
-const ENEMY_DEFINITIONS = [ [ 1, "#ff0", 0, 0 ], [ 1, "#f30", 50, 0 ], [ 0, "#c0f", 0, 20 ], [ 0, "#2f8", 70, 20 ] ]
+const ENEMY_DEFINITIONS = [
+	[ 1, "#ff0", 0, 0 ],
+	[ 1, "#f30", 50, 0 ],
+	[ 0, "#c0f", 0, 20 ],
+	[ 0, "#2f8", 70, 20 ],
+	[ 0, "#00f", 100, 100 ],
+	[ 0, "#0f0", 100, 100 ] 
+]
+
+const STATE_INIT = 0
+const STATE_TEXT = 1
+const STATE_RUNNING = 2
+const STATE_WON = 3
+
 const EIDX_SPRITE_INDEX = 0
 const EIDX_COLOR = 1
 const EIDX_WOBBLE_X = 2
@@ -17,6 +30,7 @@ const IDX_SPEED_X = 7
 const IDX_SPEED_Y = 8
 const IDX_WOBBLE_X = 9
 const IDX_POSITION_WOBBLE_X = 10
+const IDX_ENEMY_DEFINITION_INDEX = 11
 
 const OBJECT_TYPE_PLAYER = 1
 const OBJECT_TYPE_ENEMY = 2
@@ -30,12 +44,14 @@ const BEAM_INTERVAL_SEC = 0.0166
 
 const LEVEL_STEP_INTERVAL_SEC = 0.1
 
+let _state = STATE_INIT
 let _scrollSpeed = 80
 let _width = 800
 let _scale
 let _mousePosition = 0
 let _t = 0
 var a, b, c, d, e
+var _enemiesCaught
 
 // [ domElement, x, y, spriteIndex ]
 
@@ -43,7 +59,7 @@ let objects = []
 
 function createGameObject(objectType, spriteIndex, color, x, y)
 {
-	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 10 ]
+	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 0, 0 ]
 }
 
 function deleteGameObject(obj)
@@ -89,9 +105,9 @@ function enemyCaught(obj)
 	// make sure it will be cleaned up
 	obj[IDX_POSITION_Y] = MAX_OBJECT_Y_COORD
 
-	obj[IDX_SPRITE_INDEX]
-
-	console.log("Caught!")
+	_enemiesCaught[obj[IDX_ENEMY_DEFINITION_INDEX]] += 1
+	
+	updateScores()
 }
 
 function stepEnemyObject(obj, dt)
@@ -153,10 +169,12 @@ function levelStep()
 
 		if (_levelStepSkip <= 0)
 		{
-			var e = ENEMY_DEFINITIONS[getRandomIndexWeighted(_levelData[7])]
+			var i = getRandomIndexWeighted(_levelData[7])
+			var e = ENEMY_DEFINITIONS[i]
 			var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[EIDX_SPRITE_INDEX], e[EIDX_COLOR], getRandomInt(-100, 100), -130)
 			tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
 			tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
+			tmp[IDX_ENEMY_DEFINITION_INDEX] = i
 			objects.push(tmp)
 
 			_levelStepSkip = getRandomInt(_levelData[0], _levelData[1])
@@ -177,6 +195,7 @@ function levelInit(levelIndex)
 
 	_scrollSpeed = _levelData[2]
 	_randomSeed = _levelData[4]
+	_enemiesCaught =  [ 0, 0, 0, 0, 0, 0 ]
 
 	// TODO: remove all dom objects
 	// TODO? should the level step be tied to scroll speed?
@@ -184,11 +203,13 @@ function levelInit(levelIndex)
 	objects = []
 	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#cef", 0, 120))
 
+	_state = STATE_RUNNING
 }
 
 function gameInit()
 {
 	levelInit(0)
+	updateScores()
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
 }
@@ -199,6 +220,38 @@ function onMouseMove(event)
 	a = a / _scale
 	a = a / (_width / 2)
 	_mousePosition = a
+}
+
+function updateScores()
+{
+	var total1 = 0
+	var total2 = 0
+
+	for (var i=0; i<ENEMY_DEFINITIONS.length; i++)
+	{
+		var obj = document.getElementById("s" + i)
+		obj.style.display = (_levelData[8][i] == 0 ? "none" : "")
+		obj.style.color = ENEMY_DEFINITIONS[i][EIDX_COLOR]
+		obj.innerHTML = _enemiesCaught[i] + " / " + _levelData[8][i]
+		total1 += _enemiesCaught[i]
+		total2 += _levelData[8][i]
+	}
+
+	var obj = document.getElementById("st")
+	obj.innerHTML = "Total: " + total1 + " / " + total2
+}
+
+function checkWinCondition()
+{
+	for (var i=0; i<ENEMY_DEFINITIONS.length; i++)
+	{
+		if (_enemiesCaught[i] < _levelData[8][i])
+		{
+			return false
+		}
+	}
+
+	return true
 }
 
 var _bgPositionY = 0
@@ -232,6 +285,12 @@ function step()
 	}
 
 	cleanupObjects()
+
+	if (checkWinCondition())
+	{
+		_state = STATE_WON
+		console.log("win!")
+	}
 
 	// road scrolling
 	_bgPositionY += _scrollSpeed * dt

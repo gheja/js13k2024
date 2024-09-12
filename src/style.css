@@ -64,3 +64,17 @@ b
 {
 	transform: translateX(-200px) translateY(200px) translateZ(-250px);
 }
+
+#s
+{
+	position: fixed;
+	top: 0.3rem;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+#s *
+{
+	padding: 0.2rem 0.5rem;
+}
