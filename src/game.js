@@ -1,6 +1,7 @@
 "use strict"
 
 const MAX_SPEED = 75
+const MAX_OBJECT_Y_COORD = 150
 
 let _scrollSpeed = 40
 let _width = 800
@@ -18,6 +19,25 @@ let objects = []
 function createGameObject(className, spriteIndex, color, x, y)
 {
 	return [ createDomElement(className, spriteIndex, color), x, y, spriteIndex ]
+}
+
+function deleteGameObject(obj)
+{
+	obj[0].parentNode.removeChild(obj[0])
+}
+
+function cleanupEnemies()
+{
+
+	for (var i=enemies.length - 1; i>=0; i--)
+	{
+		var obj = enemies[i]
+		if (obj[2] > MAX_OBJECT_Y_COORD)
+		{
+			deleteGameObject(obj)
+			enemies.splice(i, 1)
+		}
+	}
 }
 
 function updateGameObject(obj, dt)
@@ -79,14 +99,15 @@ function step()
 	_t += dt
 
 	levelStep()
-	stepPlayerObject(playerObject, dt)
 	for (var obj of enemies)
 	{
 		stepEnemyObject(obj, dt)
 		updateGameObject(obj, dt)
 	}
-
+	stepPlayerObject(playerObject, dt)
 	updateGameObject(playerObject, dt)
+
+	cleanupEnemies()
 
 	// road scrolling
 	_bg.style.backgroundPosition = "0px " + (_t * _scrollSpeed * 3) + "px"
