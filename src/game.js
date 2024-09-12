@@ -179,6 +179,8 @@ function onMouseMove(event)
 	_mousePosition = a
 }
 
+var _bgPositionY = 0
+
 function step()
 {
 	var dt = 1/60 * _time_scale
@@ -210,7 +212,8 @@ function step()
 	cleanupObjects()
 
 	// road scrolling
-	_bg.style.backgroundPosition = "0px " + (_t * _scrollSpeed * 3) + "px"
+	_bgPositionY += _scrollSpeed * dt
+	_bg.style.backgroundPosition = "0px " + (_bgPositionY * 3) + "px"
 
 	// scaling and centering the play area
 	_scale = Math.min(document.body.clientHeight / _width, document.body.clientWidth / _width)
