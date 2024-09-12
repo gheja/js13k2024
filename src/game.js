@@ -43,15 +43,19 @@ const BEAM_INTERVAL_SEC = 0.0166
 
 const LEVEL_STEP_INTERVAL_SEC = 0.1
 
+const OOF_TIME_MAX = 2.5
+
 let _state = STATE_INIT
 let _dialogOpen = false
+let _oofActive = false
 let _scrollSpeed = 80
 let _width = 800
 let _scale
 let _mousePosition = 0
 let _t = 0
-var a, b, c, d, e
-var _enemiesCaught
+let a, b, c, d, e
+let _enemiesCaught
+let _oofTimeLeft
 
 // [ domElement, x, y, spriteIndex ]
 
@@ -210,7 +214,7 @@ function levelInit(levelIndex)
 
 function gameInit()
 {
-	levelInit(0)
+	levelInit(1)
 	updateScores()
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
@@ -225,10 +229,71 @@ function onMouseMove(event)
 	_mousePosition = a
 }
 
+function oofExecute()
+{
+	var catchesToSteal = 5
+
+	while (catchesToSteal > 0)
+	{
+		a = Math.floor(Math.random() * ENEMY_DEFINITIONS.length)
+		if (_enemiesCaught[a] == 0)
+		{
+			continue
+		}
+
+		_enemiesCaught[a] -= 1
+		catchesToSteal -= 1
+
+		// make sure it won't happen again right away
+		if (_enemiesCaught[a] > 0 && _enemiesCaught[a] % 13 == 0)
+		{
+			_enemiesCaught[a] -= 1
+			catchesToSteal -= 1
+		}
+	}
+
+	updateScores()
+}
+
+function oofStart()
+{
+	if (_oofActive)
+	{
+		return
+	}
+
+	_oofActive = true
+	_oofTimeLeft = OOF_TIME_MAX
+}
+
+function oofStop()
+{
+	_oofActive = false
+}
+
+function oofStep(dt)
+{
+	if (!_oofActive)
+	{
+		_w.style.width = 0
+		return
+	}
+
+	_oofTimeLeft = clamp(_oofTimeLeft - dt, 0, OOF_TIME_MAX)
+	_w.style.width = ((1 - (_oofTimeLeft / OOF_TIME_MAX)) * 100) + "%"
+
+	if (_oofTimeLeft == 0)
+	{
+		oofExecute()
+		_oofActive = false
+	}
+}
+
 function updateScores()
 {
 	var total1 = 0
 	var total2 = 0
+	var oof = false
 
 	for (var i=0; i<ENEMY_DEFINITIONS.length; i++)
 	{
@@ -238,10 +303,40 @@ function updateScores()
 		obj.innerHTML = _enemiesCaught[i] + " / " + _levelData[8][i]
 		total1 += _enemiesCaught[i]
 		total2 += _levelData[8][i]
+		obj.style.background = ""
+
+		if (_enemiesCaught[i] > 0)
+		{
+			if (_enemiesCaught[i] % 13 == 12)
+			{
+				obj.style.background = "#ea08"
+			}
+			else if (_enemiesCaught[i] % 13 == 0)
+			{
+				obj.style.background = "#f008"
+				oof = true
+			}
+		}
 	}
 
 	var obj = document.getElementById("st")
 	obj.innerHTML = "Total: " + total1 + " / " + total2
+	obj.style.background = ""
+
+	if (total1 > 0 && total1 % 13 == 0)
+	{
+		obj.style.background = "#f008"
+		oof = true
+	}
+
+	if (oof)
+	{
+		oofStart()
+	}
+	else
+	{
+		oofStop()
+	}
 }
 
 function checkWinCondition()
@@ -347,6 +442,8 @@ function step()
 	}
 
 	cleanupObjects()
+
+	oofStep(dt)
 
 	if (_state == STATE_RUNNING)
 	{

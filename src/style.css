@@ -3,6 +3,7 @@ html
 	font-family: bahnschrift, sans-serif;
 	font-stretch: semi-condensed;
 	font-size: 2.5vh;
+	user-select: none;
 }
 
 body
@@ -77,6 +78,7 @@ b
 #s *
 {
 	padding: 0.2rem 0.5rem;
+	transition: all 0.33s;
 }
 
 #m
@@ -103,4 +105,22 @@ b
 	padding: 0.5rem;
 	transition: all 0.33s;
 	opacity: 0;
+}
+
+#w
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 1.75rem;
+	width: 80%;
+	background: #f008;
+	animation: w 0.3s infinite;
+}
+
+@keyframes w
+{
+	0% { background: #f008; }
+	50% { background: #ff0a; }
+	100% { background: #f008; }
 }
