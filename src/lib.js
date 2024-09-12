@@ -56,3 +56,14 @@ function updatePositionRotation(obj, x, y, r, floor)
 	// translateY() here is #b's height / 2
 	obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(" + (floor ? 379.9 : 360) + "px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg) rotateX(" + (floor ? 90 : 0) + "deg)"
 }
+
+function dist(obj1, obj2)
+{
+	// Manhattan distance - close enough
+	return Math.abs(obj1[IDX_POSITION_X] - obj2[IDX_POSITION_X]) + Math.abs(obj1[IDX_POSITION_Y] - obj2[IDX_POSITION_Y])
+}
+
+function arrayPick(arr)
+{
+	return arr[Math.floor(Math.random() * arr.length)]
+}

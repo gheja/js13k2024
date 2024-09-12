@@ -13,9 +13,10 @@ const OBJECT_TYPE_PLAYER = 1
 const OBJECT_TYPE_ENEMY = 2
 const OBJECT_TYPE_BEAM = 3
 
-const MAX_SPEED = 75
+const PLAYER_MAX_SPEED = 75
 const MAX_OBJECT_Y_COORD = 150
-const BEAM_SPEED = 80
+const BEAM_SPEED = 60
+const BEAM_CATCH_DISTANCE = 5
 
 let _scrollSpeed = 40
 let _width = 800
@@ -66,11 +67,11 @@ function stepPlayerObject(obj, dt)
 {
 	var targetPosition = clamp(_mousePosition, -0.9, 0.9) * 1.098 * 200 // 1.098 is to compensate for the character not being at the very bottom
 	var direction = targetPosition > obj[IDX_POSITION_X] ? 1 : -1
-	var speed = Math.min(Math.abs(targetPosition - obj[IDX_POSITION_X]), MAX_SPEED)
+	var speed = Math.min(Math.abs(targetPosition - obj[IDX_POSITION_X]), PLAYER_MAX_SPEED)
 
 	// if (Math.random() < 0.1)
 	{
-		var tmp = createGameObject(OBJECT_TYPE_BEAM, 4, "#07f", objects[0][IDX_POSITION_X], objects[0][IDX_POSITION_Y] - 5)
+		var tmp = createGameObject(OBJECT_TYPE_BEAM, 4, arrayPick([ "#07f", "#4af", "#09f", "#a3f" ]), obj[IDX_POSITION_X], obj[IDX_POSITION_Y] - 1)
 		tmp[IDX_PHASE] = Math.random()
 		tmp[IDX_TIME_LEFT] = 1.0
 		tmp[IDX_SPEED_X] = Math.random() * 150 - 75
@@ -80,15 +81,34 @@ function stepPlayerObject(obj, dt)
 	obj[IDX_POSITION_X] = obj[IDX_POSITION_X] + speed * direction * 8 * dt
 }
 
+function enemyCaught(obj)
+{
+	// make sure it will be cleaned up
+	obj[IDX_POSITION_Y] = MAX_OBJECT_Y_COORD
+
+	console.log("Caught!")
+}
+
 function stepEnemyObject(obj, dt)
 {
 	obj[IDX_POSITION_Y] += _scrollSpeed * dt
+
+	for (var obj2 of objects)
+	{
+		if (obj2[IDX_OBJECT_TYPE] == OBJECT_TYPE_BEAM)
+		{
+			if (obj2[IDX_TIME_LEFT] > 0.2 && dist(obj, obj2) < BEAM_CATCH_DISTANCE)
+			{
+				enemyCaught(obj)
+			}
+		}
+	}
 }
 
 function stepBeamObject(obj, dt)
 {
 	obj[IDX_TIME_LEFT] -= dt
-	obj[IDX_PHASE] += dt
+	obj[IDX_PHASE] += dt * 2
 	obj[IDX_POSITION_Y] -= BEAM_SPEED * dt
 	obj[IDX_POSITION_X] += obj[IDX_SPEED_X] * dt
 }
