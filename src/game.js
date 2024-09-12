@@ -254,6 +254,18 @@ function checkWinCondition()
 	return true
 }
 
+function timescaleStep()
+{
+	var target = 0.1
+
+	if (_state == STATE_RUNNING)
+	{
+		target = 1.0
+	}
+
+	_time_scale += (target - _time_scale) * 0.05
+}
+
 var _bgPositionY = 0
 
 function step()
@@ -262,6 +274,7 @@ function step()
 
 	_t += dt
 
+	timescaleStep()
 	levelStep()
 	createBeamObjects()
 
