@@ -2,6 +2,7 @@
 
 const MAX_SPEED = 75
 
+let _scrollSpeed = 40
 let _width = 800
 let _scale
 let _mousePosition = 0
@@ -11,6 +12,7 @@ var a, b, c, d, e
 // [ domElement, x, y, spriteIndex ]
 
 let playerObject
+let enemies = []
 let objects = []
 
 function createGameObject(className, spriteIndex, color, x, y)
@@ -34,14 +36,25 @@ function stepPlayerObject(obj, dt)
 
 function stepEnemyObject(obj, dt)
 {
-	obj[1] += dt * 10
+	obj[2] += _scrollSpeed * dt
+}
+
+let _levelStepCount = 0
+function levelStep()
+{
+	_levelStepCount += 1
+
+	if (getRandomFloat() < 0.01)
+	{
+		var tmp = createGameObject("p", 1, "#ff0", getRandomInt(-100, 100), -130)
+		enemies.push(tmp)
+	}
 }
 
 function levelInit()
 {
-	playerObject = createGameObject("p", 2, "#cef", 0, 0)
-	playerObject[1] = 0
-	playerObject[2] = 120
+	playerObject = createGameObject("p", 2, "#cef", 0, 120)
+	_randomSeed = 42
 }
 
 function gameInit()
@@ -65,11 +78,18 @@ function step()
 
 	_t += dt
 
+	levelStep()
 	stepPlayerObject(playerObject, dt)
+	for (var obj of enemies)
+	{
+		stepEnemyObject(obj, dt)
+		updateGameObject(obj, dt)
+	}
+
 	updateGameObject(playerObject, dt)
 
 	// road scrolling
-	_bg.style.backgroundPosition = "0px " + (_t * 100) + "px"
+	_bg.style.backgroundPosition = "0px " + (_t * _scrollSpeed * 3) + "px"
 
 	// scaling and centering the play area
 	_scale = Math.min(document.body.clientHeight / _width, document.body.clientWidth / _width)
