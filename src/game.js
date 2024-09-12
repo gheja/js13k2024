@@ -10,7 +10,6 @@ const ENEMY_DEFINITIONS = [
 ]
 
 const STATE_INIT = 0
-const STATE_TEXT = 1
 const STATE_RUNNING = 2
 const STATE_WON = 3
 
@@ -45,6 +44,7 @@ const BEAM_INTERVAL_SEC = 0.0166
 const LEVEL_STEP_INTERVAL_SEC = 0.1
 
 let _state = STATE_INIT
+let _dialogOpen = false
 let _scrollSpeed = 80
 let _width = 800
 let _scale
@@ -204,6 +204,8 @@ function levelInit(levelIndex)
 	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#cef", 0, 120))
 
 	_state = STATE_RUNNING
+
+	popUpMessages(_levelData[5])
 }
 
 function gameInit()
@@ -212,6 +214,7 @@ function gameInit()
 	updateScores()
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
+	_mb.addEventListener("click", dismissDialog)
 }
 
 function onMouseMove(event)
@@ -255,45 +258,58 @@ function checkWinCondition()
 }
 
 var _messages = []
-var _messageInterval
-var _messageIndex = 0
-
-function popupMessageAnimation()
-{
-	_messageDomObject.style.animation = ""
-}
 
 function popupNextMessage()
 {
 	if (_messages.length == 0)
 	{
-		_state = STATE_RUNNING
+		_dialogOpen = false
 		return
 	}
 
-	_messageDomObject.innerHTML = _messages.shift()
-	_messageDomObject.style.animation = "none"
-	window.setTimeout(popupMessageAnimation, 0)
-	window.setTimeout(popupNextMessage, _messageInterval)
+	_dialogOpen = true
+
+	_m.innerHTML = _messages.shift()
+	_m.style.opacity = 1
+	_mb.style.opacity = 1
 }
 
-function popUpMessages(messages, interval)
+function popUpMessages(messages)
 {
 	_messages = messages
-	_messageInterval = interval
 
 	popupNextMessage()
+}
 
-	_state = STATE_TEXT
+function dismissDialog()
+{
+	_m.style.opacity = 0
+	_mb.style.opacity = 0
+
+	if (_messages.length == 0)
+	{
+		_dialogOpen = false
+	}
+	else
+	{
+		window.setTimeout(popupNextMessage, 500)
+	}
 }
 
 function timescaleStep()
 {
 	var target = 0.1
 
-	if (_state == STATE_RUNNING)
+	if (_dialogOpen)
 	{
-		target = 1.0
+		target = 0
+	}
+	else
+	{
+		if (_state == STATE_RUNNING)
+		{
+			target = 1.0
+		}
 	}
 
 	_time_scale += (target - _time_scale) * 0.05
@@ -332,11 +348,13 @@ function step()
 
 	cleanupObjects()
 
-	if (checkWinCondition())
+	if (_state == STATE_RUNNING)
 	{
-		_state = STATE_WON
-		console.log("win!")
-		popUpMessages([ "Congrats!", "You won", "Asdf", "Ghe" ], 3000)
+		if (checkWinCondition())
+		{
+			_state = STATE_WON
+			popUpMessages(_levelData[6])
+		}
 	}
 
 	// road scrolling

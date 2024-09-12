@@ -85,16 +85,22 @@ b
 	top: 2rem;
 	left: 2rem;
 	right: 2rem;
-	background: linear-gradient(90deg, #0008 0% 50%, #0003 50% 100%);
-	background-size: 200%;
+	background: #0008;
 	padding: 1rem;
 	text-align: center;
-	animation: m 2.8s linear forwards;
+	transition: all 0.33s;
+	opacity: 0;
 }
 
-@keyframes m {
-	0% { background-position: 100% 0; opacity: 0; }
-	5% { background-position: 100% 0; opacity: 1; }
-	95% { background-position: 0% 0; opacity: 1; }
-	100% { opacity: 0; }
+#mb
+{
+	position: fixed;
+	top: 6rem;
+	right: 2rem;
+	width: 10rem;
+	background: #000c;
+	text-align: center;
+	padding: 0.5rem;
+	transition: all 0.33s;
+	opacity: 0;
 }
