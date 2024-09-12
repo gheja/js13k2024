@@ -1,5 +1,6 @@
 "use strict";
 
+let _d
 let root;
 let bg;
 let _sprites;
@@ -47,10 +48,9 @@ function createObject(className, index, color)
 	return tmp
 }
 
-function updatePositionRotation(obj, x, y, r) {
-	// obj.style.transform = "translateX(" + _zz(x) + "px) translateY(" + _zz(y) + "px) translateZ(30px) rotate(" + r + "deg)"
+function updatePositionRotation(obj, x, y, r, floor) {
 	// translateY() here is #b's height / 2
-	obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(360px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg)"
+	obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(" + (floor ? 379.9 : 360) + "px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg) rotateX(" + (floor ? 90 : 0) + "deg)"
 }
 
 function init()
@@ -60,10 +60,11 @@ function init()
 	_sprites.src = GFX_SPRITES
 }
 
-var a, b, c, d
+var a, b, c, d, e
 
 function init2()
 {
+	_d = document.getElementById("d")
 	root = document.getElementById("g")
 	bg = document.getElementById("b")
 	bg.style.background = "url(" + GFX_BACKGROUND + ")"
@@ -73,6 +74,10 @@ function init2()
 	b = createObject("p", 1, "#fc0")
 	c = createObject("p", 2, "#cef")
 	d = createObject("p", 1, "#3f0")
+
+	// a shadow
+	// e = createObject("p", 1, "#000")
+	e = createObject("p", 3, "#000")
 
 	window.setInterval(step, 1000/60)
 }
@@ -84,11 +89,20 @@ function step()
 {
 	_t += 1/60 * _time_scale
 
-	updatePositionRotation(a, Math.sin(_t * 3.70) * 200, Math.sin(_t * 0.57) * 125, 0)
-	updatePositionRotation(b, Math.sin(_t * 1.45) * 200, Math.sin(_t * 0.68) * 125, 0)
-	updatePositionRotation(c, Math.sin(_t * 1.71) * 200,  Math.sin(_t * 1.00) * 125, 0)
-	updatePositionRotation(d, Math.sin(_t * 1.38) * 50,  Math.sin(_t * 1.24) * 125, 0)
+	updatePositionRotation(a, Math.sin(_t * 3.70) * 200, Math.sin(_t * 0.57) * 125,  0, 0)
+	updatePositionRotation(b, Math.sin(_t * 1.45) * 200, Math.sin(_t * 0.68) * 125,  0, 0)
+	updatePositionRotation(c, Math.sin(_t * 1.71) * 200,  Math.sin(_t * 1.00) * 125, 0, 0)
+	updatePositionRotation(d, Math.sin(_t * 1.38) * 50,  Math.sin(_t * 1.24) * 125,  0, 0)
+
+	updatePositionRotation(e, Math.sin(_t * 1.38) * 50,  Math.sin(_t * 1.24) * 125,  0, 1)
+
+	// road scrolling
 	bg.style.backgroundPosition = "0px " + (_t * 100) + "px"
+
+	// scaling and centering the play area
+	var s = Math.min(document.body.clientHeight / 800, document.body.clientWidth / 800)
+	_d.style.transform = "scale(" + s + ") perspective(800px)"
+	_d.style.left = (document.body.clientWidth / 2) + "px"
 }
 
 window.addEventListener("load", init)

@@ -24,8 +24,10 @@ b
 }
 
 #d {
+	/*
 	transform: scale(1) perspective(800px);
-	left: 400px;
+	left: 0px;
+	*/
 	transform-origin: 0px 0px 0px;
 }
 
@@ -38,7 +40,6 @@ b
 {
 	width: 400px;
 	height: 800px;
-	background: #ff00ff80;
 	transform: translateY(0) rotateX(90deg) translateX(-200px) translateY(0px);
 }
 #g *
