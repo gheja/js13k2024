@@ -16,5 +16,5 @@ function getRandomInt(min, max)
 
 function getRandomPick(arr)
 {
-    return arr[getRandomInt(0, arr.length - 1)]
+    return arr[getRandomInt(0, arr.length)]
 }
