@@ -60,7 +60,8 @@ function updatePositionRotation(obj, x, y, r, floor)
 function dist(obj1, obj2)
 {
 	// Manhattan distance - close enough
-	return Math.abs(obj1[IDX_POSITION_X] - obj2[IDX_POSITION_X]) + Math.abs(obj1[IDX_POSITION_Y] - obj2[IDX_POSITION_Y])
+	// return Math.abs(obj1[IDX_POSITION_X] - obj2[IDX_POSITION_X]) + Math.abs(obj1[IDX_POSITION_Y] - obj2[IDX_POSITION_Y])
+	return Math.abs((obj1[IDX_POSITION_X] + obj1[IDX_POSITION_WOBBLE_X]) - (obj2[IDX_POSITION_X] + obj2[IDX_POSITION_WOBBLE_X])) + Math.abs(obj1[IDX_POSITION_Y] - obj2[IDX_POSITION_Y])
 }
 
 function arrayPick(arr)

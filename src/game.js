@@ -1,5 +1,11 @@
 "use strict"
 
+const ENEMY_DEFINITIONS = [ [ 1, "#ff0", 0, 0 ], [ 1, "#f30", 50, 0 ], [ 0, "#c0f", 0, 20 ], [ 0, "#2f8", 70, 20 ] ]
+const EIDX_SPRITE_INDEX = 0
+const EIDX_COLOR = 1
+const EIDX_WOBBLE_X = 2
+const EIDX_SPEED_Y = 3
+
 const IDX_DOM_OBJECT = 0
 const IDX_POSITION_X = 1
 const IDX_POSITION_Y = 2
@@ -8,6 +14,9 @@ const IDX_OBJECT_TYPE = 4
 const IDX_PHASE = 5
 const IDX_TIME_LEFT = 6
 const IDX_SPEED_X = 7
+const IDX_SPEED_Y = 8
+const IDX_WOBBLE_X = 9
+const IDX_POSITION_WOBBLE_X = 10
 
 const OBJECT_TYPE_PLAYER = 1
 const OBJECT_TYPE_ENEMY = 2
@@ -18,7 +27,7 @@ const MAX_OBJECT_Y_COORD = 150
 const BEAM_SPEED = 60
 const BEAM_CATCH_DISTANCE = 5
 
-let _scrollSpeed = 40
+let _scrollSpeed = 80
 let _width = 800
 let _scale
 let _mousePosition = 0
@@ -31,7 +40,7 @@ let objects = []
 
 function createGameObject(objectType, spriteIndex, color, x, y)
 {
-	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0 ]
+	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 10 ]
 }
 
 function deleteGameObject(obj)
@@ -57,10 +66,10 @@ function updateGameObject(obj, dt)
 	var r = 0
 	if (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_BEAM)
 	{
-		r = obj[IDX_PHASE] * 360
+		r = obj[IDX_PHASE] * 360 * 2
 		obj[IDX_DOM_OBJECT].style.opacity = obj[IDX_TIME_LEFT]
 	}
-	updatePositionRotation(obj[IDX_DOM_OBJECT], obj[IDX_POSITION_X], obj[IDX_POSITION_Y], r, 0)
+	updatePositionRotation(obj[IDX_DOM_OBJECT], obj[IDX_POSITION_X] + obj[IDX_POSITION_WOBBLE_X], obj[IDX_POSITION_Y], r, 0)
 }
 
 function stepPlayerObject(obj, dt)
@@ -86,12 +95,17 @@ function enemyCaught(obj)
 	// make sure it will be cleaned up
 	obj[IDX_POSITION_Y] = MAX_OBJECT_Y_COORD
 
+	obj[IDX_SPRITE_INDEX]
+
 	console.log("Caught!")
 }
 
 function stepEnemyObject(obj, dt)
 {
 	obj[IDX_POSITION_Y] += _scrollSpeed * dt
+	obj[IDX_POSITION_Y] += obj[IDX_SPEED_Y] * dt
+	obj[IDX_PHASE] += dt
+	obj[IDX_POSITION_WOBBLE_X] = obj[IDX_WOBBLE_X] * Math.sin(obj[IDX_PHASE])
 
 	for (var obj2 of objects)
 	{
@@ -108,7 +122,7 @@ function stepEnemyObject(obj, dt)
 function stepBeamObject(obj, dt)
 {
 	obj[IDX_TIME_LEFT] -= dt
-	obj[IDX_PHASE] += dt * 2
+	obj[IDX_PHASE] += dt
 	obj[IDX_POSITION_Y] -= BEAM_SPEED * dt
 	obj[IDX_POSITION_X] += obj[IDX_SPEED_X] * dt
 }
@@ -120,7 +134,10 @@ function levelStep()
 
 	if (getRandomFloat() < 0.01)
 	{
-		var tmp = createGameObject(OBJECT_TYPE_ENEMY, 1, "#ff0", getRandomInt(-100, 100), -130)
+		var e = arrayPick(ENEMY_DEFINITIONS)
+		var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[0], e[1], getRandomInt(-100, 100), -130)
+		tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
+		tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
 		objects.push(tmp)
 	}
 }
