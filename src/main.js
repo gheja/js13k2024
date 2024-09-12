@@ -1,9 +1,9 @@
-"use strict";
+"use strict"
 
 let _d
-let _root;
-let _bg;
-let _sprites;
+let _root
+let _bg
+let _sprites
 let _time_scale = 1.0
 
 function init()

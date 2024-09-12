@@ -1,6 +1,6 @@
-"use strict";
+"use strict"
 
-let _t = 0;
+let _t = 0
 var a, b, c, d, e
 
 function gameInit()
