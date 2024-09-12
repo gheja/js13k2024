@@ -254,6 +254,39 @@ function checkWinCondition()
 	return true
 }
 
+var _messages = []
+var _messageInterval
+var _messageIndex = 0
+
+function popupMessageAnimation()
+{
+	_messageDomObject.style.animation = ""
+}
+
+function popupNextMessage()
+{
+	if (_messages.length == 0)
+	{
+		_state = STATE_RUNNING
+		return
+	}
+
+	_messageDomObject.innerHTML = _messages.shift()
+	_messageDomObject.style.animation = "none"
+	window.setTimeout(popupMessageAnimation, 0)
+	window.setTimeout(popupNextMessage, _messageInterval)
+}
+
+function popUpMessages(messages, interval)
+{
+	_messages = messages
+	_messageInterval = interval
+
+	popupNextMessage()
+
+	_state = STATE_TEXT
+}
+
 function timescaleStep()
 {
 	var target = 0.1
@@ -303,6 +336,7 @@ function step()
 	{
 		_state = STATE_WON
 		console.log("win!")
+		popUpMessages([ "Congrats!", "You won", "Asdf", "Ghe" ], 3000)
 	}
 
 	// road scrolling

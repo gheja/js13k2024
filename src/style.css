@@ -78,3 +78,23 @@ b
 {
 	padding: 0.2rem 0.5rem;
 }
+
+#m
+{
+	position: fixed;
+	top: 2rem;
+	left: 2rem;
+	right: 2rem;
+	background: linear-gradient(90deg, #0008 0% 50%, #0003 50% 100%);
+	background-size: 200%;
+	padding: 1rem;
+	text-align: center;
+	animation: m 2.8s linear forwards;
+}
+
+@keyframes m {
+	0% { background-position: 100% 0; opacity: 0; }
+	5% { background-position: 100% 0; opacity: 1; }
+	95% { background-position: 0% 0; opacity: 1; }
+	100% { opacity: 0; }
+}
