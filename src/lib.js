@@ -13,6 +13,11 @@ function _zz(x)
 // cache the sprites so there's no need to process them every time
 let _spriteCache = []
 
+function clamp(x, min, max)
+{
+	return (x < min ? min : (x > max ? max : x))
+}
+
 function getSprite(x, y, width, height, color)
 {
 	let a = [x, y, width, height, color].join(",")
@@ -38,7 +43,7 @@ function getSprite(x, y, width, height, color)
 	return _spriteCache[a]
 }
 
-function createObject(className, index, color)
+function createDomElement(className, index, color)
 {
 	var tmp = document.createElement("img")
 	tmp.className = className
