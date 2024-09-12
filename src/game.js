@@ -1,5 +1,15 @@
 "use strict"
 
+const IDX_DOM_OBJECT = 0
+const IDX_POSITION_X = 1
+const IDX_POSITION_Y = 2
+const IDX_SPRITE_INDEX = 3
+const IDX_OBJECT_TYPE = 4
+
+const OBJECT_TYPE_PLAYER = 1
+const OBJECT_TYPE_ENEMY = 2
+const OBJECT_TYPE_BEAM = 3
+
 const MAX_SPEED = 75
 const MAX_OBJECT_Y_COORD = 150
 
@@ -12,51 +22,49 @@ var a, b, c, d, e
 
 // [ domElement, x, y, spriteIndex ]
 
-let playerObject
-let enemies = []
 let objects = []
 
-function createGameObject(className, spriteIndex, color, x, y)
+function createGameObject(objectType, spriteIndex, color, x, y)
 {
-	return [ createDomElement(className, spriteIndex, color), x, y, spriteIndex ]
+	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType ]
 }
 
 function deleteGameObject(obj)
 {
-	obj[0].parentNode.removeChild(obj[0])
+	obj[IDX_DOM_OBJECT].parentNode.removeChild(obj[IDX_DOM_OBJECT])
 }
 
-function cleanupEnemies()
+function cleanupObjects()
 {
 
-	for (var i=enemies.length - 1; i>=0; i--)
+	for (var i=objects.length - 1; i>=0; i--)
 	{
-		var obj = enemies[i]
-		if (obj[2] > MAX_OBJECT_Y_COORD)
+		var obj = objects[i]
+		if (obj[IDX_POSITION_Y] > MAX_OBJECT_Y_COORD)
 		{
 			deleteGameObject(obj)
-			enemies.splice(i, 1)
+			objects.splice(i, 1)
 		}
 	}
 }
 
 function updateGameObject(obj, dt)
 {
-	updatePositionRotation(obj[0], obj[1], obj[2], 0, 0)
+	updatePositionRotation(obj[IDX_DOM_OBJECT], obj[IDX_POSITION_X], obj[IDX_POSITION_Y], 0, 0)
 }
 
 function stepPlayerObject(obj, dt)
 {
 	var targetPosition = clamp(_mousePosition, -0.9, 0.9) * 1.098 * 200 // 1.098 is to compensate for the character not being at the very bottom
-	var direction = targetPosition > obj[1] ? 1 : -1
-	var speed = Math.min(Math.abs(targetPosition - obj[1]), MAX_SPEED)
+	var direction = targetPosition > obj[IDX_POSITION_X] ? 1 : -1
+	var speed = Math.min(Math.abs(targetPosition - obj[IDX_POSITION_X]), MAX_SPEED)
 
-	obj[1] = obj[1] + speed * direction * 8 * dt
+	obj[IDX_POSITION_X] = obj[IDX_POSITION_X] + speed * direction * 8 * dt
 }
 
 function stepEnemyObject(obj, dt)
 {
-	obj[2] += _scrollSpeed * dt
+	obj[IDX_POSITION_Y] += _scrollSpeed * dt
 }
 
 let _levelStepCount = 0
@@ -66,14 +74,14 @@ function levelStep()
 
 	if (getRandomFloat() < 0.01)
 	{
-		var tmp = createGameObject("p", 1, "#ff0", getRandomInt(-100, 100), -130)
-		enemies.push(tmp)
+		var tmp = createGameObject(OBJECT_TYPE_ENEMY, 1, "#ff0", getRandomInt(-100, 100), -130)
+		objects.push(tmp)
 	}
 }
 
 function levelInit()
 {
-	playerObject = createGameObject("p", 2, "#cef", 0, 120)
+	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#cef", 0, 120))
 	_randomSeed = 42
 }
 
@@ -99,15 +107,22 @@ function step()
 	_t += dt
 
 	levelStep()
-	for (var obj of enemies)
+	for (var i=0; i<objects.length; i++)
 	{
-		stepEnemyObject(obj, dt)
+		var obj = objects[i]
+
+		if (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_PLAYER)
+		{
+			stepPlayerObject(obj, dt)
+		}
+		else
+		{
+			stepEnemyObject(obj, dt)
+		}
 		updateGameObject(obj, dt)
 	}
-	stepPlayerObject(playerObject, dt)
-	updateGameObject(playerObject, dt)
 
-	cleanupEnemies()
+	cleanupObjects()
 
 	// road scrolling
 	_bg.style.backgroundPosition = "0px " + (_t * _scrollSpeed * 3) + "px"

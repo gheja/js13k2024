@@ -43,10 +43,9 @@ function getSprite(x, y, width, height, color)
 	return _spriteCache[a]
 }
 
-function createDomElement(className, index, color)
+function createDomElement(index, color)
 {
 	var tmp = document.createElement("img")
-	tmp.className = className
 	tmp.src = getSprite(index * 8, 0, 8, 8, color)
 	_root.appendChild(tmp)
 	return tmp
