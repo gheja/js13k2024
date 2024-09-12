@@ -13,3 +13,8 @@ function getRandomInt(min, max)
 {
     return (getRandomFloat() * (max - min) + min) | 0;
 }
+
+function getRandomPick(arr)
+{
+    return arr[getRandomInt(0, arr.length - 1)]
+}

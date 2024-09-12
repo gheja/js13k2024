@@ -26,6 +26,9 @@ const PLAYER_MAX_SPEED = 75
 const MAX_OBJECT_Y_COORD = 150
 const BEAM_SPEED = 60
 const BEAM_CATCH_DISTANCE = 5
+const BEAM_INTERVAL_SEC = 0.0166
+
+const LEVEL_STEP_INTERVAL_SEC = 0.1
 
 let _scrollSpeed = 80
 let _width = 800
@@ -78,15 +81,6 @@ function stepPlayerObject(obj, dt)
 	var direction = targetPosition > obj[IDX_POSITION_X] ? 1 : -1
 	var speed = Math.min(Math.abs(targetPosition - obj[IDX_POSITION_X]), PLAYER_MAX_SPEED)
 
-	// if (Math.random() < 0.1)
-	{
-		var tmp = createGameObject(OBJECT_TYPE_BEAM, 4, arrayPick([ "#07f", "#4af", "#09f", "#a3f" ]), obj[IDX_POSITION_X], obj[IDX_POSITION_Y] - 1)
-		tmp[IDX_PHASE] = Math.random()
-		tmp[IDX_TIME_LEFT] = 1.0
-		tmp[IDX_SPEED_X] = Math.random() * 150 - 75
-		objects.push(tmp)
-	}
-
 	obj[IDX_POSITION_X] = obj[IDX_POSITION_X] + speed * direction * 8 * dt
 }
 
@@ -119,6 +113,22 @@ function stepEnemyObject(obj, dt)
 	}
 }
 
+var _nextBeamObjectTime = 0
+
+function createBeamObjects()
+{
+	while (_nextBeamObjectTime < _t)
+	{
+		var tmp = createGameObject(OBJECT_TYPE_BEAM, 4, arrayPick([ "#07f", "#4af", "#09f", "#a3f" ]), objects[0][IDX_POSITION_X], objects[0][IDX_POSITION_Y] - 1)
+		tmp[IDX_PHASE] = Math.random()
+		tmp[IDX_TIME_LEFT] = 1.0
+		tmp[IDX_SPEED_X] = Math.random() * 150 - 75
+		objects.push(tmp)
+
+		_nextBeamObjectTime += BEAM_INTERVAL_SEC
+	}
+}
+
 function stepBeamObject(obj, dt)
 {
 	obj[IDX_TIME_LEFT] -= dt
@@ -128,17 +138,23 @@ function stepBeamObject(obj, dt)
 }
 
 let _levelStepCount = 0
+let _nextLevelStepTime = 0
 function levelStep()
 {
-	_levelStepCount += 1
-
-	if (getRandomFloat() < 0.01)
+	while (_nextLevelStepTime < _t)
 	{
-		var e = arrayPick(ENEMY_DEFINITIONS)
-		var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[0], e[1], getRandomInt(-100, 100), -130)
-		tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
-		tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
-		objects.push(tmp)
+		_levelStepCount += 1
+
+		if (getRandomFloat() < 0.1)
+		{
+			var e = getRandomPick(ENEMY_DEFINITIONS)
+			var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[0], e[1], getRandomInt(-100, 100), -130)
+			tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
+			tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
+			objects.push(tmp)
+		}
+
+		_nextLevelStepTime += LEVEL_STEP_INTERVAL_SEC
 	}
 }
 
@@ -170,6 +186,8 @@ function step()
 	_t += dt
 
 	levelStep()
+	createBeamObjects()
+
 	for (var i=0; i<objects.length; i++)
 	{
 		var obj = objects[i]
