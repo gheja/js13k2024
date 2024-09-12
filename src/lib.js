@@ -1,10 +1,12 @@
 "use strict";
 
-function _z(x){
+function _z(x)
+{
 	return x
 }
 
-function _zz(x) {
+function _zz(x)
+{
 	return x
 }
 
@@ -20,12 +22,16 @@ function getSprite(x, y, width, height, color)
 		let canvas = document.createElement("canvas");
 		canvas.width = _z(width);
 		canvas.height = _z(height);
+
 		let ctx = canvas.getContext("2d");
 		ctx.imageSmoothingEnabled = false;
 		ctx.drawImage(_sprites, x, y, width, height, 0, 0, _z(width), _z(height));
+
+        // modulation
 		ctx.globalCompositeOperation = "source-atop"
 		ctx.fillStyle = color
 		ctx.fillRect(0, 0, 8, 8)
+
 		_spriteCache[a] = canvas.toDataURL();
 	}
 
@@ -37,12 +43,12 @@ function createObject(className, index, color)
 	var tmp = document.createElement("img")
 	tmp.className = className
 	tmp.src = getSprite(index * 8, 0, 8, 8, color)
-	tmp.style.transform = "translateX(30px) translateY(10px) translateZ(30px) rotate(0deg)"
-	root.appendChild(tmp)
+	_root.appendChild(tmp)
 	return tmp
 }
 
-function updatePositionRotation(obj, x, y, r, floor) {
+function updatePositionRotation(obj, x, y, r, floor)
+{
 	// translateY() here is #b's height / 2
 	obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(" + (floor ? 379.9 : 360) + "px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg) rotateX(" + (floor ? 90 : 0) + "deg)"
 }

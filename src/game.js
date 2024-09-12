@@ -29,7 +29,7 @@ function step()
 	updatePositionRotation(e, Math.sin(_t * 1.38) * 50,  Math.sin(_t * 1.24) * 125,  0, 1)
 
 	// road scrolling
-	bg.style.backgroundPosition = "0px " + (_t * 100) + "px"
+	_bg.style.backgroundPosition = "0px " + (_t * 100) + "px"
 
 	// scaling and centering the play area
 	var s = Math.min(document.body.clientHeight / 800, document.body.clientWidth / 800)

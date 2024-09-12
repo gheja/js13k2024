@@ -1,8 +1,8 @@
 "use strict";
 
 let _d
-let root;
-let bg;
+let _root;
+let _bg;
 let _sprites;
 let _time_scale = 1.0
 
@@ -16,10 +16,10 @@ function init()
 function init2()
 {
 	_d = document.getElementById("d")
-	root = document.getElementById("g")
-	bg = document.getElementById("b")
-	bg.style.background = "url(" + GFX_BACKGROUND + ")"
-	bg.style.backgroundSize = "30%"
+	_root = document.getElementById("g")
+	_bg = document.getElementById("b")
+	_bg.style.background = "url(" + GFX_BACKGROUND + ")"
+	_bg.style.backgroundSize = "30%"
 	gameInit()
 }
 
