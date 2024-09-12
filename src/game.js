@@ -137,36 +137,58 @@ function stepBeamObject(obj, dt)
 	obj[IDX_POSITION_X] += obj[IDX_SPEED_X] * dt
 }
 
+let _levelData
 let _levelStepCount = 0
 let _nextLevelStepTime = 0
+let _levelStepSkip = 0
+
 function levelStep()
 {
 	while (_nextLevelStepTime < _t)
 	{
 		_levelStepCount += 1
 
-		if (getRandomFloat() < 0.1)
+		// interpolate between the min and max level speed, limit to 60 sec
+		_scrollSpeed = _levelData[2] + (clamp(_t, 0, 60) / 60) * (_levelData[3] - _levelData[2])
+
+		if (_levelStepSkip <= 0)
 		{
-			var e = getRandomPick(ENEMY_DEFINITIONS)
-			var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[0], e[1], getRandomInt(-100, 100), -130)
+			var e = ENEMY_DEFINITIONS[getRandomIndexWeighted(_levelData[7])]
+			var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[EIDX_SPRITE_INDEX], e[EIDX_COLOR], getRandomInt(-100, 100), -130)
 			tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
 			tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
 			objects.push(tmp)
+
+			_levelStepSkip = getRandomInt(_levelData[0], _levelData[1])
 		}
 
 		_nextLevelStepTime += LEVEL_STEP_INTERVAL_SEC
+		_levelStepSkip -= 1
 	}
 }
 
-function levelInit()
+function levelInit(levelIndex)
 {
+	_t = 0
+	_nextBeamObjectTime = 0
+	_nextLevelStepTime = 0
+
+	_levelData = LEVELS[levelIndex]
+
+	_scrollSpeed = _levelData[2]
+	_randomSeed = _levelData[4]
+
+	// TODO: remove all dom objects
+	// TODO? should the level step be tied to scroll speed?
+
+	objects = []
 	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#cef", 0, 120))
-	_randomSeed = 42
+
 }
 
 function gameInit()
 {
-	levelInit()
+	levelInit(0)
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
 }
