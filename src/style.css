@@ -1,0 +1,69 @@
+html
+{
+	font-family: bahnschrift, sans-serif;
+	font-stretch: semi-condensed;
+	font-size: 2.5vh;
+}
+
+body
+{
+	background: #222;
+	color: #ccc;
+	overflow: hidden;
+}
+
+*
+{
+	image-rendering: pixelated;
+	cursor: default;
+}
+
+b
+{
+	color: #fff;
+}
+
+#d {
+	transform: scale(1) perspective(800px);
+	left: 400px;
+	transform-origin: 0px 0px 0px;
+}
+
+#d, #d * {
+	transform-style: preserve-3d;
+	position: absolute;
+}
+
+#b
+{
+	width: 400px;
+	height: 800px;
+	background: #ff00ff80;
+	transform: translateY(0) rotateX(90deg) translateX(-200px) translateY(0px);
+}
+#g *
+{
+	width: 40px;
+	height: 40px;
+	position: absolute;
+}
+
+#f1, #f2, #f3, #f4
+{
+	width: 400px;
+	height: 200px;
+	background: #2228;
+	transform: translateX(-200px) translateY(200px) translateZ(-100px);
+}
+#f2
+{
+	transform: translateX(-200px) translateY(200px) translateZ(-150px);
+}
+#f3
+{
+	transform: translateX(-200px) translateY(200px) translateZ(-200px);
+}
+#f4
+{
+	transform: translateX(-200px) translateY(200px) translateZ(-250px);
+}
