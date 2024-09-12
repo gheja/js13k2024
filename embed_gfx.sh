@@ -7,8 +7,8 @@ source_dir="${dir}/src"
 {
 echo -n "const GFX_SPRITES = \"data:image/png;base64,"
 cat "${source_dir}/graphics/sprites_optimized.png" | base64 --wrap 0
-echo "\";"
+echo "\""
 echo -n "const GFX_BACKGROUND = \"data:image/png;base64,"
 cat "${source_dir}/graphics/background_optimized.png" | base64 --wrap 0
-echo "\";"
+echo "\""
 } > "${source_dir}/data_graphics.js"
