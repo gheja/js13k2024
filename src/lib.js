@@ -51,10 +51,11 @@ function createDomElement(index, color)
 	return tmp
 }
 
-function updatePositionRotation(obj, x, y, r, floor)
+function updatePositionRotation(obj, x, y, z, r)
 {
 	// translateY() here is #b's height / 2
-	obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(" + (floor ? 379.9 : 360) + "px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg) rotateX(" + (floor ? 90 : 0) + "deg)"
+	// obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(" + (floor ? 379.9 : 360) + "px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg) rotateX(" + (floor ? 90 : 0) + "deg)"
+	obj.style.transform = "translateX(" + _zz(x - 20) + "px) translateY(" + (360 + _zz(z)) + "px) translateZ(" + _zz(y * 3) + "px) rotate(" + r + "deg) rotateX(0deg)"
 }
 
 function dist(obj1, obj2)

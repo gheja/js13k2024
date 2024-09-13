@@ -32,10 +32,13 @@ const IDX_POSITION_WOBBLE_X = 10
 const IDX_ENEMY_DEFINITION_INDEX = 11
 const IDX_ENEMY_GROUP_LEADER = 12
 const IDX_ENEMY_GROUP_SHIFT_X = 13
+const IDX_POSITION_Z = 14
+const IDX_SPEED_Z = 15
 
 const OBJECT_TYPE_PLAYER = 1
 const OBJECT_TYPE_ENEMY = 2
 const OBJECT_TYPE_BEAM = 3
+const OBJECT_TYPE_PARTICLE = 4
 
 const PLAYER_MAX_SPEED = 75
 const MAX_OBJECT_Y_COORD = 150
@@ -65,7 +68,7 @@ let objects = []
 
 function createGameObject(objectType, spriteIndex, color, x, y)
 {
-	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 0, 0, null, 0 ]
+	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 0, 0, null, 0, 0, 0 ]
 }
 
 function deleteGameObject(obj)
@@ -78,7 +81,7 @@ function cleanupObjects()
 	for (var i=objects.length - 1; i>=0; i--)
 	{
 		var obj = objects[i]
-		if (obj[IDX_POSITION_Y] > MAX_OBJECT_Y_COORD || (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_BEAM && obj[IDX_TIME_LEFT] < 0))
+		if (obj[IDX_POSITION_Y] > MAX_OBJECT_Y_COORD || ((obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_BEAM || obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_PARTICLE) && obj[IDX_TIME_LEFT] < 0))
 		{
 			deleteGameObject(obj)
 			objects.splice(i, 1)
@@ -94,7 +97,13 @@ function updateGameObject(obj, dt)
 		r = obj[IDX_PHASE] * 360 * 2
 		obj[IDX_DOM_OBJECT].style.opacity = obj[IDX_TIME_LEFT]
 	}
-	updatePositionRotation(obj[IDX_DOM_OBJECT], obj[IDX_POSITION_X] + obj[IDX_POSITION_WOBBLE_X], obj[IDX_POSITION_Y], r, 0)
+
+	if (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_PARTICLE)
+	{
+		r = obj[IDX_PHASE] * 360 * -0.5
+		obj[IDX_DOM_OBJECT].style.opacity = obj[IDX_TIME_LEFT]
+	}
+	updatePositionRotation(obj[IDX_DOM_OBJECT], obj[IDX_POSITION_X] + obj[IDX_POSITION_WOBBLE_X], obj[IDX_POSITION_Y], obj[IDX_POSITION_Z], r)
 }
 
 function stepPlayerObject(obj, dt)
@@ -189,6 +198,15 @@ function stepBeamObject(obj, dt)
 	obj[IDX_PHASE] += dt
 	obj[IDX_POSITION_Y] -= BEAM_SPEED * dt
 	obj[IDX_POSITION_X] += obj[IDX_SPEED_X] * dt
+}
+
+function stepParticleObject(obj, dt)
+{
+	obj[IDX_POSITION_X] += obj[IDX_SPEED_X] * dt
+	obj[IDX_POSITION_Y] += obj[IDX_SPEED_Y] * dt
+	obj[IDX_POSITION_Z] += obj[IDX_SPEED_Z] * dt
+	obj[IDX_PHASE] += dt
+	obj[IDX_TIME_LEFT] -= dt
 }
 
 let _currentLevelIndex = -1
@@ -288,6 +306,16 @@ function onMouseMove(event)
 	_mousePosition = a
 }
 
+function throwEnemyAsParticle(e)
+{
+	var tmp = createGameObject(OBJECT_TYPE_PARTICLE, ENEMY_DEFINITIONS[e][EIDX_SPRITE_INDEX], ENEMY_DEFINITIONS[e][EIDX_COLOR], objects[0][IDX_POSITION_X], objects[0][IDX_POSITION_Y] - 1)
+	tmp[IDX_PHASE] = Math.random()
+	tmp[IDX_TIME_LEFT] = 1.0
+	tmp[IDX_SPEED_X] = Math.random() * 600 - 300
+	tmp[IDX_SPEED_Z] = Math.random() * -300
+	objects.push(tmp)
+}
+
 function oofExecute()
 {
 	var totalCatches = 0
@@ -306,18 +334,20 @@ function oofExecute()
 			continue
 		}
 
+		throwEnemyAsParticle(a)
 		_enemiesCaught[a] -= 1
 		catchesToSteal -= 1
 
 		// make sure it won't happen again right away
 		if (_enemiesCaught[a] > 0 && _enemiesCaught[a] % 13 == 0)
 		{
+			throwEnemyAsParticle(a)
 			_enemiesCaught[a] -= 1
 			catchesToSteal -= 1
 		}
 	}
 
-	_o.style.animation = "o 0.15s forwards"
+	_o.style.animation = "o 0.33s forwards"
 	_time_scale = 0.0
 
 	updateScores()
@@ -517,11 +547,15 @@ function step()
 		{
 			stepEnemyObject(obj, dt)
 		}
-		else // OBJECT_TYPE_BEAM
+		else if (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_BEAM)
 		{
 			stepBeamObject(obj, dt)
 		}
-
+		else if (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_PARTICLE)
+		{
+			stepParticleObject(obj, dt)
+		}
+			
 		updateGameObject(obj, dt)
 	}
 
