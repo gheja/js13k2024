@@ -30,6 +30,8 @@ const IDX_SPEED_Y = 8
 const IDX_WOBBLE_X = 9
 const IDX_POSITION_WOBBLE_X = 10
 const IDX_ENEMY_DEFINITION_INDEX = 11
+const IDX_ENEMY_GROUP_LEADER = 12
+const IDX_ENEMY_GROUP_SHIFT_X = 13
 
 const OBJECT_TYPE_PLAYER = 1
 const OBJECT_TYPE_ENEMY = 2
@@ -63,7 +65,7 @@ let objects = []
 
 function createGameObject(objectType, spriteIndex, color, x, y)
 {
-	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 0, 0 ]
+	return [ createDomElement(spriteIndex, color), x, y, spriteIndex, objectType, 0, 0, 0, 0, 0, 0, 0, null, 0 ]
 }
 
 function deleteGameObject(obj)
@@ -114,12 +116,44 @@ function enemyCaught(obj)
 	updateScores()
 }
 
+function enemyGroupCaught(obj)
+{
+	var leader = obj[IDX_ENEMY_GROUP_LEADER]
+
+	if (leader)
+	{
+		enemyGroupCaught(leader)
+		return
+	}
+
+	enemyCaught(obj)
+
+	for (var obj2 of objects)
+	{
+		if (obj2[IDX_ENEMY_GROUP_LEADER] && obj == obj2[IDX_ENEMY_GROUP_LEADER])
+		{
+			enemyCaught(obj2)
+		}
+	}
+}
+
 function stepEnemyObject(obj, dt)
 {
-	obj[IDX_POSITION_Y] += _scrollSpeed * dt
-	obj[IDX_POSITION_Y] += obj[IDX_SPEED_Y] * dt
-	obj[IDX_PHASE] += dt
-	obj[IDX_POSITION_WOBBLE_X] = obj[IDX_WOBBLE_X] * Math.sin(obj[IDX_PHASE])
+	if (obj[IDX_ENEMY_GROUP_LEADER])
+	{
+		var leader = obj[IDX_ENEMY_GROUP_LEADER]
+		obj[IDX_POSITION_X] = leader[IDX_POSITION_X] + obj[IDX_ENEMY_GROUP_SHIFT_X]
+		obj[IDX_POSITION_Y] = leader[IDX_POSITION_Y]
+		obj[IDX_POSITION_WOBBLE_X] = leader[IDX_POSITION_WOBBLE_X]
+		obj[IDX_PHASE] = leader[IDX_PHASE]
+	}
+	else
+	{
+		obj[IDX_POSITION_Y] += _scrollSpeed * dt
+		obj[IDX_POSITION_Y] += obj[IDX_SPEED_Y] * dt
+		obj[IDX_PHASE] += dt
+		obj[IDX_POSITION_WOBBLE_X] = obj[IDX_WOBBLE_X] * Math.sin(obj[IDX_PHASE])
+	}
 
 	for (var obj2 of objects)
 	{
@@ -127,10 +161,10 @@ function stepEnemyObject(obj, dt)
 		{
 			if (obj2[IDX_TIME_LEFT] > 0.2 && dist(obj, obj2) < BEAM_CATCH_DISTANCE)
 			{
-				enemyCaught(obj)
+				enemyGroupCaught(obj)
 			}
 		}
-	}
+	}	
 }
 
 var _nextBeamObjectTime = 0
@@ -164,6 +198,19 @@ let _levelStepSkip = 0
 
 function levelStep()
 {
+	function create()
+	{
+		var i = getRandomIndexWeighted(_levelData[7])
+		var e = ENEMY_DEFINITIONS[i]
+		var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[EIDX_SPRITE_INDEX], e[EIDX_COLOR], getRandomInt(-100, 100), -130)
+		tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
+		tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
+		tmp[IDX_ENEMY_DEFINITION_INDEX] = i
+		objects.push(tmp)
+
+		return tmp
+	}
+
 	while (_nextLevelStepTime < _t)
 	{
 		_levelStepCount += 1
@@ -173,14 +220,16 @@ function levelStep()
 
 		if (_levelStepSkip <= 0)
 		{
-			var i = getRandomIndexWeighted(_levelData[7])
-			var e = ENEMY_DEFINITIONS[i]
-			var tmp = createGameObject(OBJECT_TYPE_ENEMY, e[EIDX_SPRITE_INDEX], e[EIDX_COLOR], getRandomInt(-100, 100), -130)
-			tmp[IDX_WOBBLE_X] = e[EIDX_WOBBLE_X]
-			tmp[IDX_SPEED_Y] = e[EIDX_SPEED_Y]
-			tmp[IDX_ENEMY_DEFINITION_INDEX] = i
-			objects.push(tmp)
+			var leader = create()
+			var group = getRandomIndexWeighted(_levelData[9])
 
+			while (group > 0)
+			{
+				var follower = create()
+				follower[IDX_ENEMY_GROUP_LEADER] = leader
+				follower[IDX_ENEMY_GROUP_SHIFT_X] = group * 40
+				group -= 1
+			}
 			_levelStepSkip = getRandomInt(_levelData[0], _levelData[1])
 		}
 
@@ -214,7 +263,7 @@ function levelInit(levelIndex)
 
 function gameInit()
 {
-	levelInit(1)
+	levelInit(3)
 	updateScores()
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
@@ -449,6 +498,7 @@ function step()
 		{
 			stepBeamObject(obj, dt)
 		}
+
 		updateGameObject(obj, dt)
 	}
 
