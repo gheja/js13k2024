@@ -90,7 +90,7 @@ b
 	background: #0008;
 	padding: 1rem;
 	text-align: center;
-	transition: all 0.33s;
+	transition: all 0.15s;
 	opacity: 0;
 }
 
@@ -103,7 +103,7 @@ b
 	background: #000c;
 	text-align: center;
 	padding: 0.5rem;
-	transition: all 0.33s;
+	transition: all 0.15s;
 	opacity: 0;
 }
 

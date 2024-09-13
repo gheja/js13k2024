@@ -316,6 +316,10 @@ function updateScores()
 				obj.style.background = "#f008"
 				oof = true
 			}
+			else if (_enemiesCaught[i] >= _levelData[8][i])
+			{
+				obj.style.background = "#0f05"
+			}
 		}
 	}
 
@@ -323,10 +327,17 @@ function updateScores()
 	obj.innerHTML = "Total: " + total1 + " / " + total2
 	obj.style.background = ""
 
-	if (total1 > 0 && total1 % 13 == 0)
+	if (total1 > 0)
 	{
-		obj.style.background = "#f008"
-		oof = true
+		if (total1 % 13 == 12)
+		{
+			obj.style.background = "#ea08"
+		}
+		else if (total1 % 13 == 0)
+		{
+			obj.style.background = "#f008"
+			oof = true
+		}
 	}
 
 	if (oof)
@@ -387,7 +398,7 @@ function dismissDialog()
 	}
 	else
 	{
-		window.setTimeout(popupNextMessage, 500)
+		window.setTimeout(popupNextMessage, 200)
 	}
 }
 
