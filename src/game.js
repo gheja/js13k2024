@@ -117,6 +117,13 @@ function stepPlayerObject(obj, dt)
 
 function enemyCaught(obj)
 {
+	// a particle effect
+	var tmp = createGameObject(OBJECT_TYPE_PARTICLE, 5, "#fff", obj[IDX_POSITION_X], obj[IDX_POSITION_Y])
+	tmp[IDX_PHASE] = Math.random()
+	tmp[IDX_TIME_LEFT] = 0.4
+	tmp[IDX_SPEED_Y] = _scrollSpeed * 1.75
+	objects.push(tmp)
+
 	// make sure it will be cleaned up
 	obj[IDX_POSITION_Y] = MAX_OBJECT_Y_COORD
 
