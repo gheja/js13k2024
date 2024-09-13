@@ -3,9 +3,9 @@
 const ENEMY_DEFINITIONS = [
 	[ 1, "#faa032", 0, 0 ],
 	[ 1, "#c40c2e", 50, 0 ],
-	[ 0, "#e29bfa", 80, 20 ],
+	[ 0, "#d94c8e", 80, 20 ],
 	[ 0, "#55b33b", 70, 20 ],
-	[ 0, "#25acf5", 100, 100 ],
+	[ 6, "#1793e6", 100, 100 ],
 	[ 0, "#b58c7f", 100, 100 ],
 ]
 
@@ -218,7 +218,7 @@ function stepParticleObject(obj, dt)
 	obj[IDX_TIME_LEFT] -= dt
 }
 
-let _currentLevelIndex = -1
+let _currentLevelIndex = 3
 let _levelData
 let _levelStepCount = 0
 let _nextLevelStepTime = 0
@@ -284,7 +284,7 @@ function levelInit(levelIndex)
 	_root.innerHTML = ""
 
 	objects = []
-	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#5cf", 0, 120))
+	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#9df", 0, 120))
 
 	_state = STATE_RUNNING
 
