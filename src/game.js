@@ -365,7 +365,7 @@ function oofExecute()
 
 	var catchesToSteal = Math.floor(Math.max(5, totalCatches * 0.3))
 
-	while (catchesToSteal > 0)
+	while (catchesToSteal > 0 && totalCatches > 0)
 	{
 		a = Math.floor(Math.random() * ENEMY_DEFINITIONS.length)
 		if (_enemiesCaught[a] == 0)
@@ -376,6 +376,7 @@ function oofExecute()
 		throwEnemyAsParticle(a)
 		_enemiesCaught[a] -= 1
 		catchesToSteal -= 1
+		totalCatches -= 1
 
 		// make sure it won't happen again right away
 		if (_enemiesCaught[a] > 0 && _enemiesCaught[a] % 13 == 0)
@@ -383,6 +384,7 @@ function oofExecute()
 			throwEnemyAsParticle(a)
 			_enemiesCaught[a] -= 1
 			catchesToSteal -= 1
+			totalCatches -= 1
 		}
 	}
 
