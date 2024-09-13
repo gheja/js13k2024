@@ -191,6 +191,7 @@ function stepBeamObject(obj, dt)
 	obj[IDX_POSITION_X] += obj[IDX_SPEED_X] * dt
 }
 
+let _currentLevelIndex = -1
 let _levelData
 let _levelStepCount = 0
 let _nextLevelStepTime = 0
@@ -250,8 +251,10 @@ function levelInit(levelIndex)
 	_randomSeed = _levelData[4]
 	_enemiesCaught =  [ 0, 0, 0, 0, 0, 0 ]
 
-	// TODO: remove all dom objects
 	// TODO? should the level step be tied to scroll speed?
+
+	// delete all child objects the hacky way
+	_root.innerHTML = ""
 
 	objects = []
 	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#5cf", 0, 120))
@@ -261,10 +264,17 @@ function levelInit(levelIndex)
 	popUpMessages(_levelData[5])
 }
 
+function loadNextLevel()
+{
+	_currentLevelIndex += 1
+	levelInit(_currentLevelIndex)
+	updateScores()
+}
+
 function gameInit()
 {
-	levelInit(4)
-	updateScores()
+	loadNextLevel()
+	// popUpMessages([ "Welcome!" ])
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
 	_mb.addEventListener("click", dismissDialog)
@@ -444,6 +454,10 @@ function dismissDialog()
 	if (_messages.length == 0)
 	{
 		_dialogOpen = false
+		if (_state == STATE_INIT || _state == STATE_WON)
+		{
+			loadNextLevel()
+		}
 	}
 	else
 	{

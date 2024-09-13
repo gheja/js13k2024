@@ -7,7 +7,7 @@ let _m     // message div
 let _mb    // message button
 let _w     // warning bar at top
 let _sprites  // decoded from the const
-let _time_scale = 1.0
+let _time_scale = 0.0
 
 function init()
 {
