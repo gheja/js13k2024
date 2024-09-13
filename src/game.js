@@ -39,12 +39,14 @@ const OBJECT_TYPE_PLAYER = 1
 const OBJECT_TYPE_ENEMY = 2
 const OBJECT_TYPE_BEAM = 3
 const OBJECT_TYPE_PARTICLE = 4
+const OBJECT_TYPE_HUMAN = 5
 
 const PLAYER_MAX_SPEED = 75
 const MAX_OBJECT_Y_COORD = 150
 const BEAM_SPEED = 60
 const BEAM_CATCH_DISTANCE = 5
 const BEAM_INTERVAL_SEC = 0.0166
+const HUMAN_COLOR = "#9df"
 
 const LEVEL_STEP_INTERVAL_SEC = 0.1
 
@@ -155,6 +157,15 @@ function enemyGroupCaught(obj)
 	}
 }
 
+function humanCaught(obj)
+{
+	// make sure it will be cleaned up
+	obj[IDX_POSITION_Y] = MAX_OBJECT_Y_COORD
+
+	oofExecute()
+	throwHumanAsParticle()
+}
+
 function stepEnemyObject(obj, dt)
 {
 	if (obj[IDX_ENEMY_GROUP_LEADER])
@@ -218,7 +229,27 @@ function stepParticleObject(obj, dt)
 	obj[IDX_TIME_LEFT] -= dt
 }
 
-let _currentLevelIndex = 3
+function stepHumanObject(obj, dt)
+{
+	obj[IDX_POSITION_Y] += _scrollSpeed * dt
+	obj[IDX_POSITION_Y] += obj[IDX_SPEED_Y] * dt
+	obj[IDX_PHASE] += dt
+	obj[IDX_POSITION_WOBBLE_X] = obj[IDX_WOBBLE_X] * Math.sin(obj[IDX_PHASE])
+
+	for (var obj2 of objects)
+	{
+		if (obj2[IDX_OBJECT_TYPE] == OBJECT_TYPE_BEAM)
+		{
+			if (obj2[IDX_TIME_LEFT] > 0.2 && dist(obj, obj2) < BEAM_CATCH_DISTANCE)
+			{
+				humanCaught(obj)
+			}
+		}
+	}	
+}
+
+
+let _currentLevelIndex = -1
 let _levelData
 let _levelStepCount = 0
 let _nextLevelStepTime = 0
@@ -248,6 +279,15 @@ function levelStep()
 
 		if (_levelStepSkip <= 0)
 		{
+			// create a human
+			if (getRandomFloat() < _levelData[11])
+			{
+				var tmp = createGameObject(OBJECT_TYPE_HUMAN, 7, HUMAN_COLOR, getRandomInt(-110, 110), -110)
+				tmp[IDX_WOBBLE_X] = 90
+				tmp[IDX_SPEED_Y] = 0
+				objects.push(tmp)
+			}
+
 			var leader = create()
 			var group = getRandomIndexWeighted(_levelData[9])
 
@@ -258,6 +298,7 @@ function levelStep()
 				follower[IDX_ENEMY_GROUP_SHIFT_X] = group * 40
 				group -= 1
 			}
+
 			_levelStepSkip = getRandomInt(_levelData[0], _levelData[1])
 		}
 
@@ -284,10 +325,16 @@ function levelInit(levelIndex)
 	_root.innerHTML = ""
 
 	objects = []
-	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#9df", 0, 120))
+	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, HUMAN_COLOR, 0, 120))
 
 	_state = STATE_RUNNING
+	_dialogOpen = true
 
+	window.setTimeout(levelStartMessages, 1500)
+}
+
+function levelStartMessages()
+{
 	popUpMessages(_levelData[5])
 }
 
@@ -301,11 +348,14 @@ function loadNextLevel()
 
 	levelInit(_currentLevelIndex)
 	updateScores()
+	setCover(false)
 }
 
 function gameInit()
 {
 	loadNextLevel()
+	setCover(false)
+
 	// popUpMessages([ "Welcome!" ])
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
@@ -348,6 +398,16 @@ function onMouseMove(event)
 function throwEnemyAsParticle(e)
 {
 	var tmp = createGameObject(OBJECT_TYPE_PARTICLE, ENEMY_DEFINITIONS[e][EIDX_SPRITE_INDEX], ENEMY_DEFINITIONS[e][EIDX_COLOR], objects[0][IDX_POSITION_X], objects[0][IDX_POSITION_Y] - 1)
+	tmp[IDX_PHASE] = Math.random()
+	tmp[IDX_TIME_LEFT] = 1.0
+	tmp[IDX_SPEED_X] = Math.random() * 600 - 300
+	tmp[IDX_SPEED_Z] = Math.random() * -300
+	objects.push(tmp)
+}
+
+function throwHumanAsParticle()
+{
+	var tmp = createGameObject(OBJECT_TYPE_PARTICLE, 7, HUMAN_COLOR, objects[0][IDX_POSITION_X], objects[0][IDX_POSITION_Y] - 1)
 	tmp[IDX_PHASE] = Math.random()
 	tmp[IDX_TIME_LEFT] = 1.0
 	tmp[IDX_SPEED_X] = Math.random() * 600 - 300
@@ -503,6 +563,12 @@ function checkWinCondition()
 	return true
 }
 
+function queueLoadNextLevel()
+{
+	setCover(true)
+	window.setTimeout(loadNextLevel, 2000)
+}
+
 var _messages = []
 
 function popupNextMessage()
@@ -539,13 +605,19 @@ function dismissDialog()
 		_dialogOpen = false
 		if (_state == STATE_INIT || _state == STATE_WON)
 		{
-			loadNextLevel()
+			queueLoadNextLevel()
 		}
 	}
 	else
 	{
 		window.setTimeout(popupNextMessage, 200)
 	}
+}
+
+function setCover(on)
+{
+	_r.style.bottom = on ? "0vh" : "100vh"
+	_r.style.top = on ? "0vh" : "-100vh"
 }
 
 function timescaleStep()
@@ -564,7 +636,7 @@ function timescaleStep()
 		}
 	}
 
-	_time_scale += (target - _time_scale) * 0.05
+	_time_scale += (target - _time_scale) * 0.03
 }
 
 var _bgPositionY = 0
@@ -599,7 +671,11 @@ function step()
 		{
 			stepParticleObject(obj, dt)
 		}
-			
+		else if (obj[IDX_OBJECT_TYPE] == OBJECT_TYPE_HUMAN)
+		{
+			stepHumanObject(obj, dt)
+		}
+					
 		updateGameObject(obj, dt)
 	}
 

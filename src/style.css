@@ -125,7 +125,7 @@ b
 	100% { background: #f008; }
 }
 
-#o
+#o, #r
 {
 	position: fixed;
 	top: 0;
@@ -133,13 +133,26 @@ b
 	bottom: 0;
 	left: 0;
 	background: #fff6;
-	opacity: 0.0;
+	opacity: 0;
 }
 
 @keyframes o
 {
-	0% { opacity: 1.0; }
-	100% { opacity: 0.0; }
+	0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+#r
+{
+	opacity: 1;
+	transition: all 1s;
+	animation: r 30s linear infinite;
+}
+
+@keyframes r
+{
+	0% { background-position: 0% 0% }
+	100% { background-position: 300% -100% }
 }
 
 #q
