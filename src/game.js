@@ -336,6 +336,12 @@ function onMouseMove(event)
 	let a = e.clientX - document.body.clientWidth / 2
 	a = a / _scale
 	a = a / (_width / 2)
+
+	if (a === undefined || isNaN(a))
+	{
+		return
+	}
+
 	_mousePosition = a
 }
 
