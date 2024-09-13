@@ -175,7 +175,7 @@ function createBeamObjects()
 	{
 		var tmp = createGameObject(OBJECT_TYPE_BEAM, 4, arrayPick([ "#07f", "#4af", "#09f", "#a3f" ]), objects[0][IDX_POSITION_X], objects[0][IDX_POSITION_Y] - 1)
 		tmp[IDX_PHASE] = Math.random()
-		tmp[IDX_TIME_LEFT] = 1.0
+		tmp[IDX_TIME_LEFT] = _levelData[10]
 		tmp[IDX_SPEED_X] = Math.random() * 150 - 75
 		objects.push(tmp)
 
@@ -263,7 +263,7 @@ function levelInit(levelIndex)
 
 function gameInit()
 {
-	levelInit(3)
+	levelInit(4)
 	updateScores()
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
