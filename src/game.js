@@ -3,7 +3,7 @@
 const ENEMY_DEFINITIONS = [
 	[ 1, "#faa032", 0, 0 ],
 	[ 1, "#c40c2e", 50, 0 ],
-	[ 0, "#e29bfa", 0, 20 ],
+	[ 0, "#e29bfa", 80, 20 ],
 	[ 0, "#55b33b", 70, 20 ],
 	[ 0, "#25acf5", 100, 100 ],
 	[ 0, "#b58c7f", 100, 100 ],
@@ -298,7 +298,7 @@ function loadNextLevel()
 	{
 		_currentLevelIndex = 0
 	}
-	
+
 	levelInit(_currentLevelIndex)
 	updateScores()
 }
@@ -309,12 +309,31 @@ function gameInit()
 	// popUpMessages([ "Welcome!" ])
 	window.setInterval(step, 1000/60)
 	window.addEventListener("mousemove", onMouseMove)
+	window.addEventListener("touchstart", onMouseMove);
+	window.addEventListener("touchend", onMouseMove);
+	window.addEventListener("touchcancel", onMouseMove);
+	window.addEventListener("touchmove", onMouseMove);
 	_mb.addEventListener("click", dismissDialog)
 }
 
 function onMouseMove(event)
 {
-	let a = event.clientX - document.body.clientWidth / 2
+	let e
+	if (event.touches && event.touches.length > 0)
+	{
+		e = event.touches[0]
+	}
+	else
+	{
+		e = event
+	}
+
+	if (e.clientX === undefined)
+	{
+		return
+	}
+
+	let a = e.clientX - document.body.clientWidth / 2
 	a = a / _scale
 	a = a / (_width / 2)
 	_mousePosition = a
