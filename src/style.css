@@ -124,3 +124,20 @@ b
 	50% { background: #ff0a; }
 	100% { background: #f008; }
 }
+
+#o
+{
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: #fc04;
+	opacity: 0.0;
+}
+
+@keyframes o
+{
+	0% { opacity: 1.0; }
+	100% { opacity: 0.0; }
+}

@@ -290,7 +290,13 @@ function onMouseMove(event)
 
 function oofExecute()
 {
-	var catchesToSteal = 5
+	var totalCatches = 0
+	for (var i=0; i<ENEMY_DEFINITIONS.length; i++)
+	{
+		totalCatches += _enemiesCaught[i]
+	}
+
+	var catchesToSteal = Math.floor(Math.max(5, totalCatches * 0.3))
 
 	while (catchesToSteal > 0)
 	{
@@ -310,6 +316,9 @@ function oofExecute()
 			catchesToSteal -= 1
 		}
 	}
+
+	_o.style.animation = "o 0.15s forwards"
+	_time_scale = 0.0
 
 	updateScores()
 }

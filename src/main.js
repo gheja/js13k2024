@@ -6,6 +6,7 @@ let _bg    // background layer
 let _m     // message div
 let _mb    // message button
 let _w     // warning bar at top
+let _o     // overlay
 let _sprites  // decoded from the const
 let _time_scale = 0.0
 
@@ -24,6 +25,9 @@ function init2()
 	_m = document.getElementById("m")
 	_mb = document.getElementById("mb")
 	_w = document.getElementById("w")
+	_o = document.getElementById("o")
+
+	_o.addEventListener("animationend", function() { this.style.animation = "none" })
 
 	_bg.style.background = "url(" + GFX_BACKGROUND + ")"
 	_bg.style.backgroundSize = "30%"
