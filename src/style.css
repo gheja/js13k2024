@@ -113,7 +113,7 @@ b
 	top: 0;
 	left: 0;
 	height: 1.75rem;
-	width: 80%;
+	width: 0%;
 	background: #f008;
 	animation: w 0.3s infinite;
 }
@@ -140,4 +140,14 @@ b
 {
 	0% { opacity: 1.0; }
 	100% { opacity: 0.0; }
+}
+
+#q
+{
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	padding: 30%;
+	text-align: center;
 }

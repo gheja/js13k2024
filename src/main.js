@@ -7,6 +7,7 @@ let _m     // message div
 let _mb    // message button
 let _w     // warning bar at top
 let _o     // overlay
+let _q     // "click to start" overlay
 let _sprites  // decoded from the const
 let _time_scale = 0.0
 
@@ -26,13 +27,22 @@ function init2()
 	_mb = document.getElementById("mb")
 	_w = document.getElementById("w")
 	_o = document.getElementById("o")
+	_q = document.getElementById("q")
 
 	_o.addEventListener("animationend", function() { this.style.animation = "none" })
 
 	_bg.style.background = "url(" + GFX_BACKGROUND + ")"
 	_bg.style.backgroundSize = "30%"
 
+	_q.innerHTML = "Click to start"
+	_q.addEventListener("click", init3)
+}
+
+function init3()
+{
+	_q.parentNode.removeChild(_q)
 	gameInit()
+	soundManagerInit()
 }
 
 window.addEventListener("load", init)

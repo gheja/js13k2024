@@ -120,7 +120,8 @@ export PATH="${target_dir}/stage1/node_modules/.bin:${PATH}"
 # note: near.js has a near.min.js version
 
 files_html="index.html"
-files_javascript=`cat index.html | grep -E '<script.* src="([^"]+)"' | grep -Eo 'src=\".*\"' | cut -d \" -f 2 | grep -vE '/socket.io|https:|bonus/near\.js' | grep -vE '^(3rdparty|bonus|https:)/'`
+# files_javascript=`cat index.html | grep -E '<script.* src="([^"]+)"' | grep -Eo 'src=\".*\"' | cut -d \" -f 2 | grep -vE '/socket.io|https:|bonus/near\.js' | grep -vE '^(3rdparty|bonus|https:)/'`
+files_javascript=`cat index.html | grep -E '<script.* src="([^"]+)"' | grep -Eo 'src=\".*\"' | cut -d \" -f 2`
 # files_javascript_extra=`cat index.html | grep -E '<script.* src="([^"]+)"' | grep -Eo 'src=\".*\"' | cut -d \" -f 2 | grep -vE '/socket.io|https:|bonus/near\.js' | grep -E '^(3rdparty|bonus)/'`
 # files_typescript=`echo "$files_javascript" | sed -r 's/\.js$/.ts/g'`
 files_css=`cat index.html | grep -E '<link type="text/css" rel="stylesheet" href="([^"]+)"' | grep -Eo 'href=\".*\"' | cut -d \" -f 2`

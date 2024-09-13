@@ -136,6 +136,8 @@ function enemyGroupCaught(obj)
 {
 	var leader = obj[IDX_ENEMY_GROUP_LEADER]
 
+	zzfx(...SOUNDS[1])
+
 	if (leader)
 	{
 		enemyGroupCaught(leader)
@@ -292,6 +294,11 @@ function levelInit(levelIndex)
 function loadNextLevel()
 {
 	_currentLevelIndex += 1
+	if (_currentLevelIndex >= LEVELS.length)
+	{
+		_currentLevelIndex = 0
+	}
+	
 	levelInit(_currentLevelIndex)
 	updateScores()
 }
@@ -356,6 +363,7 @@ function oofExecute()
 
 	_o.style.animation = "o 0.33s forwards"
 	_time_scale = 0.0
+	zzfx(...SOUNDS[3])
 
 	updateScores()
 }
@@ -477,6 +485,8 @@ function popupNextMessage()
 		_dialogOpen = false
 		return
 	}
+
+	zzfx(...SOUNDS[4])
 
 	_dialogOpen = true
 
