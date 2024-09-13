@@ -1,12 +1,12 @@
 "use strict"
 
 const ENEMY_DEFINITIONS = [
-	[ 1, "#ff0", 0, 0 ],
-	[ 1, "#f30", 50, 0 ],
-	[ 0, "#c0f", 0, 20 ],
-	[ 0, "#2f8", 70, 20 ],
-	[ 0, "#00f", 100, 100 ],
-	[ 0, "#0f0", 100, 100 ] 
+	[ 1, "#faa032", 0, 0 ],
+	[ 1, "#c40c2e", 50, 0 ],
+	[ 0, "#e29bfa", 0, 20 ],
+	[ 0, "#55b33b", 70, 20 ],
+	[ 0, "#25acf5", 100, 100 ],
+	[ 0, "#b58c7f", 100, 100 ],
 ]
 
 const STATE_INIT = 0
@@ -254,7 +254,7 @@ function levelInit(levelIndex)
 	// TODO? should the level step be tied to scroll speed?
 
 	objects = []
-	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#cef", 0, 120))
+	objects.push(createGameObject(OBJECT_TYPE_PLAYER, 2, "#5cf", 0, 120))
 
 	_state = STATE_RUNNING
 

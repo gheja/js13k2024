@@ -8,7 +8,7 @@ html
 
 body
 {
-	background: #222;
+	background: #291414;
 	color: #ccc;
 	overflow: hidden;
 }
@@ -50,7 +50,7 @@ b
 {
 	width: 400px;
 	height: 200px;
-	background: #2228;
+	background: #29141488;
 	transform: translateX(-200px) translateY(200px) translateZ(-100px);
 }
 #f2
